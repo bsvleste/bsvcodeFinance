@@ -19,4 +19,3 @@ export function TransactionButton({title,type,isActive,...rest}:Props){
     </S.Container>
   );
 }
-//perei aula 05 formularios
