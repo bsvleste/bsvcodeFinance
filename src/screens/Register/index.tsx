@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {Keyboard, TouchableWithoutFeedback,Alert} from 'react-native'
 import * as S from './styles'
 import { Button } from '../../components/Form/Button';
@@ -10,10 +10,11 @@ import {Controller,useForm} from 'react-hook-form'
 import { InputForm } from '../../components/Form/InputForm';
 import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native';
 interface FormData{
   name:string
-  amount:string
+  amount:number
 }
 
 const schema = yup.object().shape({
@@ -24,6 +25,7 @@ const schema = yup.object().shape({
   .required("O valor é obrigatorio")
 })
 export function Register() {
+  const collectionKey = '@bsvcodeFinance:transactions'
   const {control,handleSubmit, formState:{errors}} = useForm({
     resolver:yupResolver(schema)
   })
@@ -42,17 +44,35 @@ export function Register() {
   function handleCloseSelectCategoryModal() {
     setIsCategoryModalOpen(false)
   }
-  function handleRegister(form:FormData){
+  async function handleRegister(form:FormData){
     if(!transactionType) return Alert.alert("Informe o tipo de transação")
     if(category.key === 'category') return Alert.alert("Informe a categoria")
-    const data={
+    const newTransaction={
       name:form.name,
       amount:form.amount,
       transactionType,
       category:category.key
     }
-    console.log(data)
+    try {
+      const transactionData = await AsyncStorage.getItem(collectionKey);
+      const currentData = transactionData ? JSON.parse(transactionData) : []
+      const dataFormatted =[
+        ...currentData,
+        newTransaction
+      ]
+      await AsyncStorage.setItem(collectionKey,JSON.stringify(dataFormatted))
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Não foi possivel salvar,tente novamente")
+    }    
   }
+useFocusEffect(useCallback(()=>{
+  async function LaodData(){
+    const data = await AsyncStorage.getItem(collectionKey)
+    console.log(JSON.parse(data!))
+  }
+  LaodData();
+},[]))
   return (
   <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <S.Container>

@@ -6,6 +6,8 @@ import theme from './src/theme';
 import { Loading } from './src/components/Loading';
 import { Register } from './src/screens/Register';
 import { CategorySelect } from './src/screens/CategorySelect';
+import { NavigationContainer } from '@react-navigation/native';
+import AppRoutes from './src/routes/app.routes';
 export default function App() {
   const [fonstLoaded] = useFonts({
     Poppins_400Regular,
@@ -15,8 +17,10 @@ export default function App() {
   if (!fonstLoaded) return <Loading />
   return (
     <ThemeProvider theme={theme}>
-      <StatusBar style="light" />
-      <Register/>
+      <NavigationContainer>
+        <StatusBar style="light" />
+        <AppRoutes/>
+      </NavigationContainer>
     </ThemeProvider>
 
   );
