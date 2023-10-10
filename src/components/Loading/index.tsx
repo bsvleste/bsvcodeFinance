@@ -1,7 +1,10 @@
 import { ActivityIndicator } from "react-native";
-
+import * as S from './styles'
 export function Loading() {
+
 	return (
-		<ActivityIndicator />
+		<S.Container>
+		<S.Loading />
+		</S.Container>
 	)
 }

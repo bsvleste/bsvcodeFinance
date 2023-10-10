@@ -6,6 +6,7 @@ import theme from '../theme';
 import { Feather } from '@expo/vector-icons';
 import { Platform } from 'react-native';
 import{RFValue} from 'react-native-responsive-fontsize'
+import { Resume } from '../screens/Resume';
 const {Navigator,Screen} = createBottomTabNavigator()
 
 export default function AppRoutes() {
@@ -44,7 +45,7 @@ export default function AppRoutes() {
         />
       <Screen 
         name="Resumo" 
-        component={Register}
+        component={Resume}
         options={{
           tabBarIcon:({color,size})=>(
             <Feather color={color} name="pie-chart" size={size} />

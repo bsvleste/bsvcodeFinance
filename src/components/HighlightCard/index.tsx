@@ -1,7 +1,7 @@
 import React,{ReactNode} from 'react'
 import * as S from './styles'
 export interface HighlightCardProps  {
-    type?: "up" | "down" | "total";
+    type: "up" | "down" | "total";
     title: string;
     amount: string;
     lastTransaction: string;

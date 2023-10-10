@@ -1,13 +1,14 @@
 import React from 'react'
 import * as S from './styles'
 import { categories } from '../../util/categories'
+import { TextProps } from 'react-native'
 
 export interface TransactionCardProps {
   title: string,
   amount: string,
   category: string,
   date: string,
-  type: "positive" | "negative"
+  type: "up" | "down"
 }
 interface Props {
   data: TransactionCardProps
@@ -20,7 +21,7 @@ export function TransactionCard({ data }: Props) {
     <S.Container>
       <S.Title>{data.title}</S.Title>
       <S.Amount type={data.type}>
-        {data.type === "negative" && "- "}{data.amount}</S.Amount>
+        {data.type === "down" && "- "}{data.amount}</S.Amount>
       <S.Footer>
         <S.Category>
           <S.Icon name={category.icon} />

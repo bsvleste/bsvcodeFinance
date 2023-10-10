@@ -1,36 +1,39 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {Keyboard, TouchableWithoutFeedback,Alert} from 'react-native'
-import * as S from './styles'
 import { Button } from '../../components/Form/Button';
 import { TransactionButton } from '../../components/Form/TransactionButton';
 import { ButtonCategorySelect } from '../../components/Form/ButtonCategorySelect';
 import { Modal } from 'react-native';
 import { CategorySelect } from '../CategorySelect';
-import {Controller,useForm} from 'react-hook-form'
+import {useForm} from 'react-hook-form'
 import { InputForm } from '../../components/Form/InputForm';
-import * as yup from "yup"
 import { yupResolver } from "@hookform/resolvers/yup"
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import * as S from './styles'
+import * as yup from "yup"
+import uuid from 'react-native-uuid'
 interface FormData{
-  name:string
+  title:string
   amount:number
 }
 
 const schema = yup.object().shape({
-  name:yup.string().required("Nome é obrigatorio").min(3,"O nome deve ter ao menos 3 caracteres"),
+  title:yup.string().required("Nome é obrigatorio").min(3,"O nome deve ter ao menos 3 caracteres"),
   amount:yup.number()
   .typeError("Informe um valor numerico")
   .positive("O valor não pode ser negativo")
   .required("O valor é obrigatorio")
 })
 export function Register() {
+  const [isSubmited,setIsSubmited] = useState(false)
+  const {navigate} =useNavigation()
   const collectionKey = '@bsvcodeFinance:transactions'
-  const {control,handleSubmit, formState:{errors}} = useForm({
+  const {control,reset, handleSubmit,formState:{errors}} = useForm({
     resolver:yupResolver(schema)
-  })
+  }) 
   const[transactionType,setTransactionType] = useState('')
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(true)
   const [category, setCategory] = useState({
     key: 'category',
     name: 'Categoria',
@@ -48,12 +51,15 @@ export function Register() {
     if(!transactionType) return Alert.alert("Informe o tipo de transação")
     if(category.key === 'category') return Alert.alert("Informe a categoria")
     const newTransaction={
-      name:form.name,
+      id: String(uuid.v4()),
+      title:form.title,
       amount:form.amount,
-      transactionType,
-      category:category.key
+      type:transactionType,
+      category:category.key,
+      date:new Date()
     }
     try {
+      setIsSubmited(true)
       const transactionData = await AsyncStorage.getItem(collectionKey);
       const currentData = transactionData ? JSON.parse(transactionData) : []
       const dataFormatted =[
@@ -61,18 +67,21 @@ export function Register() {
         newTransaction
       ]
       await AsyncStorage.setItem(collectionKey,JSON.stringify(dataFormatted))
+      setTransactionType('')
+      setCategory({
+        key: 'category',
+        name: 'Categoria',
+      })
+      reset();
+      navigate('Listagem')
     } catch (error) {
       console.log(error)
       Alert.alert("Não foi possivel salvar,tente novamente")
+    }finally{
+      setIsSubmited(false)
     }    
   }
-useFocusEffect(useCallback(()=>{
-  async function LaodData(){
-    const data = await AsyncStorage.getItem(collectionKey)
-    console.log(JSON.parse(data!))
-  }
-  LaodData();
-},[]))
+
   return (
   <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <S.Container>
@@ -83,11 +92,11 @@ useFocusEffect(useCallback(()=>{
         <S.Fields>
           <InputForm 
             control={control}
-            name="name"
+            name="title"
             placeholder='Nome'
             autoCapitalize='sentences'
             autoCorrect={false}
-            error={errors.name && errors.name.message}
+            error={errors.title && errors.title.message}
           />
           <InputForm 
             control={control}
@@ -110,7 +119,7 @@ useFocusEffect(useCallback(()=>{
           </S.TransactionTypes>
             <ButtonCategorySelect  title={category.name} onPress={handleOpenSelectCategoryModal}/>
           </S.Fields>
-        <Button  title="Enviar" onPress={handleSubmit(handleRegister)} />
+        <Button  title="Enviar" onPress={handleSubmit(handleRegister)}   />
       </S.FormWrapper>
       <Modal visible={isCategoryModalOpen}>
           <CategorySelect 
