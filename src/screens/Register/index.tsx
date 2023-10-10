@@ -26,14 +26,13 @@ const schema = yup.object().shape({
   .required("O valor é obrigatorio")
 })
 export function Register() {
-  const [isSubmited,setIsSubmited] = useState(false)
   const {navigate} =useNavigation()
   const collectionKey = '@bsvcodeFinance:transactions'
   const {control,reset, handleSubmit,formState:{errors}} = useForm({
     resolver:yupResolver(schema)
   }) 
   const[transactionType,setTransactionType] = useState('')
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(true)
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
   const [category, setCategory] = useState({
     key: 'category',
     name: 'Categoria',
@@ -59,7 +58,6 @@ export function Register() {
       date:new Date()
     }
     try {
-      setIsSubmited(true)
       const transactionData = await AsyncStorage.getItem(collectionKey);
       const currentData = transactionData ? JSON.parse(transactionData) : []
       const dataFormatted =[
@@ -76,12 +74,9 @@ export function Register() {
       navigate('Listagem')
     } catch (error) {
       console.log(error)
-      Alert.alert("Não foi possivel salvar,tente novamente")
-    }finally{
-      setIsSubmited(false)
-    }    
+      Alert.alert("Não foi possivel salvar,tente novamente")   
   }
-
+  }
   return (
   <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <S.Container>
@@ -129,5 +124,5 @@ export function Register() {
       </Modal>
     </S.Container>
   </TouchableWithoutFeedback>
-  );
+  )
 }
