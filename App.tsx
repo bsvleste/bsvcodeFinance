@@ -5,6 +5,7 @@ import theme from './src/theme';
 import { Loading } from './src/components/Loading';
 import { NavigationContainer } from '@react-navigation/native';
 import AppRoutes from './src/routes/app.routes';
+
 export default function App() {
   const [fonstLoaded] = useFonts({
     Poppins_400Regular,

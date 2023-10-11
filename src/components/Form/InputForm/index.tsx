@@ -1,8 +1,8 @@
 import React from 'react'
+import { Control, Controller } from 'react-hook-form';
 import { TextInputProps } from 'react-native';
 import { Input } from '../Input';
 import * as S from './styles'
-import { Control, Controller } from 'react-hook-form';
 interface Props extends TextInputProps{
     control:Control
     name:string
@@ -19,7 +19,7 @@ export function InputForm({error,control,name,...rest}:Props){
           <Input 
             onChangeText={onChange}
             value={value}
-          {...rest}
+            {...rest}
           />
         )}
       />

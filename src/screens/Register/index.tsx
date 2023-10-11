@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as S from './styles'
 import * as yup from "yup"
 import uuid from 'react-native-uuid'
+
 interface FormData{
   title:string
   amount:number
@@ -86,12 +87,12 @@ export function Register() {
       <S.FormWrapper>
         <S.Fields>
           <InputForm 
-            control={control}
             name="title"
+            control={control} QQ  Q
+            error={errors.title && errors.title.message}
             placeholder='Nome'
             autoCapitalize='sentences'
             autoCorrect={false}
-            error={errors.title && errors.title.message}
           />
           <InputForm 
             control={control}

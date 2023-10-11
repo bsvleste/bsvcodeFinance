@@ -13,7 +13,7 @@ export const Container = styled.View<ContainerProps>`
   justify-content: space-between;
   border-radius: 4px;
   border-left-width: 4px;
-  border-color: ${({ theme, color }) => theme.colors[color]};
+  border-color: ${({ color }) => color};
   margin-bottom: 12px;
 `;
 export const Title = styled.Text`
