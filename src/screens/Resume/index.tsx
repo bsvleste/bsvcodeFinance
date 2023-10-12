@@ -7,6 +7,10 @@ import * as S from './styles'
 import { RFValue } from 'react-native-responsive-fontsize';
 import PieChart from 'react-native-pie-chart'
 import { Loading } from '../../components/Loading';
+import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs'
+import { ScrollView } from 'react-native';
+import dayjs from 'dayjs'
+import 'dayjs/locale/pt'
 interface TransactionsData{
   title: string,
   amount: string,
@@ -23,8 +27,20 @@ interface CategoryData {
   percent:number
 }
 export function Resume(){
+  const [selectedDate,setSelectedDate] = useState(()=>{
+    return dayjs().set('date',1)
+  });
   const [isLoading,setIsLaoding] = useState(true)
   const [categoriesExpensives,setCategoriesExpensives] = useState<CategoryData[]>([])
+ async function handleDateChange(action:"next"|"prev"){
+  if(action === 'next'){
+    setSelectedDate(selectedDate.add(1,'month'))   
+  }else{
+    setSelectedDate(selectedDate.subtract(1,'month'))
+  }
+ }
+ const currentMont = dayjs(selectedDate).locale('pt-br').format("MMMM")
+ const currentYear = dayjs(selectedDate).format("YYYY")
   async function laodData() {
     const collectionKey = '@bsvcodeFinance:transactions'
     const transactionData = await AsyncStorage.getItem(collectionKey);
@@ -75,9 +91,22 @@ export function Resume(){
       <S.Header>
         <S.Title>Resumo</S.Title>
       </S.Header>
-      <S.Content>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingHorizontal:24,paddingBottom:useBottomTabBarHeight()}}
+      >
         {isLoading? <Loading/> :
         <>
+        <S.MonthSelect>
+          <S.ButtonMontSelect activeOpacity={0.7} onPress={()=>handleDateChange('prev')}>
+            <S.SelectIcon name='chevron-left'/>
+          </S.ButtonMontSelect>
+          <S.Month>{currentMont}, {currentYear}</S.Month>
+          <S.ButtonMontSelect activeOpacity={0.7} onPress={()=>handleDateChange('next')}>
+            <S.SelectIcon name='chevron-right'/>
+          </S.ButtonMontSelect>
+        </S.MonthSelect>
+
         <S.ChartContainer>
         <PieChart 
           widthAndHeight={RFValue(250)} 
@@ -97,7 +126,7 @@ export function Resume(){
       }
       </>
       }
-      </S.Content>
+      </ScrollView>
     </S.Container>
   );
 }
