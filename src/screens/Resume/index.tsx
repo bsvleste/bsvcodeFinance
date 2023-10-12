@@ -11,6 +11,7 @@ import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs'
 import { ScrollView } from 'react-native';
 import dayjs from 'dayjs'
 import 'dayjs/locale/pt'
+import { Text } from 'react-native';
 interface TransactionsData{
   title: string,
   amount: string,
@@ -27,10 +28,10 @@ interface CategoryData {
   percent:number
 }
 export function Resume(){
+  const [isLoading,setIsLaoding] = useState(true)
   const [selectedDate,setSelectedDate] = useState(()=>{
     return dayjs().set('date',1)
   });
-  const [isLoading,setIsLaoding] = useState(true)
   const [categoriesExpensives,setCategoriesExpensives] = useState<CategoryData[]>([])
  async function handleDateChange(action:"next"|"prev"){
   if(action === 'next'){
@@ -47,7 +48,11 @@ export function Resume(){
     const currentData = transactionData ? JSON.parse(transactionData) : []
 
    const expensives = currentData
-    .filter((expensive:TransactionsData) =>expensive.type === 'down')
+    .filter((expensive:TransactionsData) =>
+      expensive.type === 'down' &&
+      new Date(expensive.date).getMonth() === selectedDate.get('month') &&
+      new Date(expensive.date).getFullYear() === selectedDate.get('year')       
+      )
     const expensivesTotal = expensives.reduce((accumulator:number,expensive:TransactionsData)=>{
       return accumulator + Number(expensive.amount)
     },0)
@@ -80,12 +85,9 @@ export function Resume(){
     setCategoriesExpensives(totalByCategory)
     setIsLaoding(false)
   }
-  useEffect(()=>{
-    laodData()
-  },[])
   useFocusEffect(useCallback(()=>{
 		laodData();
-	},[]))
+	},[selectedDate]))
   return (
     <S.Container>
       <S.Header>
@@ -108,10 +110,17 @@ export function Resume(){
         </S.MonthSelect>
 
         <S.ChartContainer>
-        <PieChart 
-          widthAndHeight={RFValue(250)} 
-          series={categoriesExpensives.map(category=>category.percent)} 
-          sliceColor={categoriesExpensives.map(category=>category.color)} />
+          {
+            categoriesExpensives.length > 0  ?
+            <>
+            <PieChart 
+            widthAndHeight={RFValue(250)} 
+            series={categoriesExpensives.map(category=>category.percent)} 
+            sliceColor={categoriesExpensives.map(category=>category.color)} />
+            </>
+            :
+            <Text>Não ha compras neste mes</Text>  
+          }
         </S.ChartContainer>
       {
         categoriesExpensives.map(category => (
