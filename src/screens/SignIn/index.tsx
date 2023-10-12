@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 
 import * as S from './styles'
 import { useTheme } from 'styled-components/native';
 import { SignInButton } from '../../components/SignInButton';
+import { useAuth } from '../../hooks/auth';
 export function SignIn(){
   const {colors} = useTheme()
   return (
